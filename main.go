@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -65,4 +66,8 @@ func ErrorJSON(w http.ResponseWriter, err error, status ...int) error {
 	payload.Message = err.Error()
 
 	return WriteJSON(w, statusCode, payload)
+}
+
+func WriteAnything(message string) {
+	log.Printf("INFO - %v", message)
 }
