@@ -13,11 +13,11 @@ type jsonResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
-func ReadJSON(r io.Reader, data interface{}) error {
+func ReadJSON(w http.ResponseWriter, r *http.Request, data interface{}) error {
 	maxBytes := 1048576
-	r = io.LimitReader(r, int64(maxBytes))
+	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 
-	d := json.NewDecoder(r)
+	d := json.NewDecoder(r.Body)
 	err := d.Decode(data)
 	if err != nil {
 		return err
@@ -31,7 +31,7 @@ func ReadJSON(r io.Reader, data interface{}) error {
 	return nil
 }
 
-func WriteJSON(w io.Writer, status int, data interface{}, headers ...http.Header) error {
+func WriteJSON(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
 	o, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func WriteJSON(w io.Writer, status int, data interface{}, headers ...http.Header
 	return nil
 }
 
-func ErrorJSON(w io.Writer, err error, status ...int) error {
+func ErrorJSON(w http.ResponseWriter, err error, status ...int) error {
 	statusCode := http.StatusBadRequest
 
 	if len(status) > 0 {
